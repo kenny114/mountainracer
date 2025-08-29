@@ -1,9 +1,8 @@
-# mountainracer
 # 🚗 AI Mountain Racer - Toddler to Pro Challenge!
 
 **The viral game that starts so easy a toddler can play, then becomes IMPOSSIBLE after 20 seconds!**
 
-[![Play Now](https://img.shields.io/badge/🎮-PLAY%20NOW-brightgreen?style=for-the-badge)](https://yourusername.github.io/ai-mountain-racer)
+[![Play Now](https://img.shields.io/badge/🎮-PLAY%20NOW-brightgreen?style=for-the-badge)](https://kenny114.github.io/mountainracer)
 [![Leaderboard](https://img.shields.io/badge/🏆-LEADERBOARD-gold?style=for-the-badge)](#leaderboard)
 
 ## 🎯 The Challenge
@@ -77,7 +76,7 @@ The game starts EASY for toddlers then becomes IMPOSSIBLE!
 
 Can you beat my score? 🏆
 
-Play: [YOUR_GITHUB_PAGES_URL]
+Play: https://kenny114.github.io/mountainracer
 
 #AIMountainRacer #GameDev #Challenge
 ```
