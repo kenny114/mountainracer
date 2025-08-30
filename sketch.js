@@ -25,7 +25,10 @@ let touchControls = {
 };
 
 function setup() {
-  createCanvas(400, 600);
+  // Mobile-responsive canvas size
+  let canvasWidth = min(400, windowWidth - 20);
+  let canvasHeight = min(600, windowHeight - 20);
+  createCanvas(canvasWidth, canvasHeight);
   noSmooth(); // For retro pixel look
   frameRate(60);
   
@@ -732,8 +735,8 @@ function drawEmailInputScreen() {
   textSize(14);
   text('Enter your email to join the leaderboard:', width/2, 310);
   
-  // Email input box
-  leaderboard.drawEmailInput(75, 320, width - 150, 35);
+  // Email input box with mobile keyboard
+  drawMobileEmailInput();
   
   // Error message
   if (submissionError) {
@@ -865,6 +868,12 @@ function handleTouch(isPressed) {
     
     // Email input screen touches
     if (showingEmailInput) {
+      // Email input box or mobile keyboard button
+      if ((tx > width/2 - 120 && tx < width/2 + 120 && ty > 320 && ty < 355) ||
+          (tx > width/2 - 60 && tx < width/2 + 60 && ty > 365 && ty < 390)) {
+        openMobileKeyboard();
+        return;
+      }
       // Submit button
       if (tx > width/2 - 100 && tx < width/2 + 100 && ty > height/2 + 160 && ty < height/2 + 190) {
         submitToLeaderboard();
@@ -977,4 +986,91 @@ function drawEmailTouchButtons() {
   textSize(12);
   text('❌ SKIP', width/2, height/2 + 213);
   noStroke();
+}
+
+function drawMobileEmailInput() {
+  // Email input box
+  fill(255, 255, 255, 230);
+  stroke(100, 200, 255);
+  strokeWeight(2);
+  rect(width/2 - 120, 320, 240, 35, 5);
+  
+  // Input text
+  fill(50);
+  textAlign(LEFT);
+  textSize(14);
+  let displayText = leaderboard.emailInput || 'Tap to enter email...';
+  text(displayText, width/2 - 110, 340);
+  
+  // Cursor blink
+  if (frameCount % 60 < 30) {
+    stroke(50);
+    strokeWeight(1);
+    let textWidth = textWidth(leaderboard.emailInput || '');
+    line(width/2 - 110 + textWidth + 2, 330, width/2 - 110 + textWidth + 2, 345);
+  }
+  
+  noStroke();
+  
+  // Mobile keyboard button
+  fill(100, 150, 255, 150);
+  stroke(100, 150, 255);
+  strokeWeight(1);
+  rect(width/2 - 60, 365, 120, 25, 5);
+  
+  fill(255);
+  textAlign(CENTER);
+  textSize(12);
+  text('📱 TAP TO TYPE', width/2, 380);
+  noStroke();
+}
+
+function openMobileKeyboard() {
+  // Create invisible input element for mobile keyboard
+  let input = document.createElement('input');
+  input.type = 'email';
+  input.placeholder = 'Enter your email';
+  input.value = leaderboard.emailInput || '';
+  input.style.position = 'fixed';
+  input.style.left = '50%';
+  input.style.top = '50%';
+  input.style.transform = 'translate(-50%, -50%)';
+  input.style.zIndex = '1000';
+  input.style.padding = '10px';
+  input.style.fontSize = '16px';
+  input.style.border = '2px solid #64C8FF';
+  input.style.borderRadius = '5px';
+  input.style.outline = 'none';
+  
+  document.body.appendChild(input);
+  input.focus();
+  
+  // Handle input changes
+  input.addEventListener('input', function() {
+    leaderboard.emailInput = input.value;
+  });
+  
+  // Handle when user is done
+  input.addEventListener('blur', function() {
+    document.body.removeChild(input);
+  });
+  
+  input.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      leaderboard.emailInput = input.value;
+      document.body.removeChild(input);
+      submitToLeaderboard();
+    }
+  });
+}
+
+function windowResized() {
+  // Resize canvas for mobile orientation changes
+  let canvasWidth = min(400, windowWidth - 20);
+  let canvasHeight = min(600, windowHeight - 20);
+  resizeCanvas(canvasWidth, canvasHeight);
+  
+  // Recreate background graphics with new size
+  bgGraphics = createGraphics(width, height * 2);
+  drawBackground(bgGraphics);
 }
