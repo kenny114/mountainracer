@@ -326,6 +326,9 @@ function draw() {
     strokeWeight(2);
     rect(width / 2 - 120, height / 2 + 83, 240, 25, 5);
     noStroke();
+    
+    // Mobile touch buttons for crash screen
+    drawCrashTouchButtons();
   }
   
   // More robust track generation
@@ -754,6 +757,9 @@ function drawEmailInputScreen() {
     textSize(14);
     text('Submitting...', width/2, 420);
   }
+  
+  // Mobile touch buttons for email input
+  drawEmailTouchButtons();
 }
 
 async function submitToLeaderboard() {
@@ -837,33 +843,138 @@ function handleTouch(isPressed) {
     return;
   }
   
-  let buttonSize = 60;
-  let margin = 20;
-  
-  // Check each touch point
-  for (let touch of touches) {
+  // Handle menu touches
+  if (isPressed && touches.length > 0) {
+    let touch = touches[0];
     let tx = touch.x;
     let ty = touch.y;
     
-    // Left button
-    if (tx > margin && tx < margin + buttonSize && 
-        ty > height - buttonSize - margin && ty < height - margin) {
-      touchControls.left = isPressed;
+    // Crash screen touches
+    if (gameOver && !showingEmailInput && !showingLeaderboard) {
+      // "Save to Leaderboard" button (main green box area)
+      if (tx > width/2 - 120 && tx < width/2 + 120 && ty > height/2 + 70 && ty < height/2 + 110) {
+        showEmailInput();
+        return;
+      }
+      // "Restart" button area
+      if (tx > width/2 - 80 && tx < width/2 + 80 && ty > height/2 + 125 && ty < height/2 + 145) {
+        resetGame();
+        return;
+      }
     }
-    // Right button
-    else if (tx > margin + buttonSize + 10 && tx < margin + buttonSize * 2 + 10 && 
-             ty > height - buttonSize - margin && ty < height - margin) {
-      touchControls.right = isPressed;
+    
+    // Email input screen touches
+    if (showingEmailInput) {
+      // Submit button
+      if (tx > width/2 - 100 && tx < width/2 + 100 && ty > height/2 + 160 && ty < height/2 + 190) {
+        submitToLeaderboard();
+        return;
+      }
+      // Skip button
+      if (tx > width/2 - 60 && tx < width/2 + 60 && ty > height/2 + 200 && ty < height/2 + 220) {
+        showingEmailInput = false;
+        resetGame();
+        return;
+      }
     }
-    // Up button
-    else if (tx > width - buttonSize - margin && tx < width - margin && 
-             ty > height - buttonSize * 2 - margin - 10 && ty < height - buttonSize - margin - 10) {
-      touchControls.up = isPressed;
-    }
-    // Down button
-    else if (tx > width - buttonSize - margin && tx < width - margin && 
-             ty > height - buttonSize - margin && ty < height - margin) {
-      touchControls.down = isPressed;
+    
+    // Leaderboard screen touches
+    if (showingLeaderboard) {
+      // Play again
+      if (tx > width/2 - 100 && tx < width/2 + 100 && ty > height - 70 && ty < height - 40) {
+        showingLeaderboard = false;
+        resetGame();
+        return;
+      }
     }
   }
+  
+  // Game control touches (only during gameplay)
+  if (!gameOver && !showingEmailInput && !showingLeaderboard) {
+    if (touches.length === 0 && !isPressed) {
+      touchControls.left = false;
+      touchControls.right = false;
+      touchControls.up = false;
+      touchControls.down = false;
+      return;
+    }
+    
+    let buttonSize = 60;
+    let margin = 20;
+    
+    // Check each touch point for game controls
+    for (let touch of touches) {
+      let tx = touch.x;
+      let ty = touch.y;
+      
+      // Left button
+      if (tx > margin && tx < margin + buttonSize && 
+          ty > height - buttonSize - margin && ty < height - margin) {
+        touchControls.left = isPressed;
+      }
+      // Right button
+      else if (tx > margin + buttonSize + 10 && tx < margin + buttonSize * 2 + 10 && 
+               ty > height - buttonSize - margin && ty < height - margin) {
+        touchControls.right = isPressed;
+      }
+      // Up button
+      else if (tx > width - buttonSize - margin && tx < width - margin && 
+               ty > height - buttonSize * 2 - margin - 10 && ty < height - buttonSize - margin - 10) {
+        touchControls.up = isPressed;
+      }
+      // Down button
+      else if (tx > width - buttonSize - margin && tx < width - margin && 
+               ty > height - buttonSize - margin && ty < height - margin) {
+        touchControls.down = isPressed;
+      }
+    }
+  }
+}
+
+function drawCrashTouchButtons() {
+  // Submit to leaderboard button (bigger and more obvious)
+  fill(100, 255, 100, 150);
+  stroke(100, 255, 100);
+  strokeWeight(2);
+  rect(width/2 - 100, height/2 + 160, 200, 30, 5);
+  
+  fill(255);
+  textAlign(CENTER);
+  textSize(16);
+  text('📧 SAVE TO LEADERBOARD', width/2, height/2 + 180);
+  
+  // Restart button (smaller)
+  fill(255, 255, 255, 100);
+  stroke(255);
+  strokeWeight(1);
+  rect(width/2 - 60, height/2 + 200, 120, 20, 5);
+  
+  fill(255);
+  textSize(12);
+  text('🔄 RESTART', width/2, height/2 + 213);
+  noStroke();
+}
+
+function drawEmailTouchButtons() {
+  // Submit button
+  fill(100, 255, 100, 150);
+  stroke(100, 255, 100);
+  strokeWeight(2);
+  rect(width/2 - 80, height/2 + 160, 160, 30, 5);
+  
+  fill(255);
+  textAlign(CENTER);
+  textSize(14);
+  text('✅ SUBMIT SCORE', width/2, height/2 + 180);
+  
+  // Skip button
+  fill(255, 100, 100, 100);
+  stroke(255, 100, 100);
+  strokeWeight(1);
+  rect(width/2 - 50, height/2 + 200, 100, 20, 5);
+  
+  fill(255);
+  textSize(12);
+  text('❌ SKIP', width/2, height/2 + 213);
+  noStroke();
 }
