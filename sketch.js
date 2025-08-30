@@ -16,6 +16,14 @@ let bgGraphics; // For parallax background
 let sledSprite; // Player asset
 let noiseOffset = 0;
 
+// Mobile touch controls
+let touchControls = {
+  left: false,
+  right: false,
+  up: false,
+  down: false
+};
+
 function setup() {
   createCanvas(400, 600);
   noSmooth(); // For retro pixel look
@@ -99,16 +107,16 @@ function draw() {
     speed = constrain(speed, 0, targetSpeed);
     score += 1;
     
-    // Steering controls - slower movement
-    if (keyIsDown(LEFT_ARROW)) player.steer = -1;
-    else if (keyIsDown(RIGHT_ARROW)) player.steer = 1;
+    // Steering controls - slower movement (keyboard + touch)
+    if (keyIsDown(LEFT_ARROW) || touchControls.left) player.steer = -1;
+    else if (keyIsDown(RIGHT_ARROW) || touchControls.right) player.steer = 1;
     else player.steer *= 0.9; // Dampen steering
     player.x += player.steer;
     player.x = constrain(player.x, 0, width);
     
-    // Brake and boost
-    if (keyIsDown(DOWN_ARROW)) speed -= friction;
-    if (keyIsDown(UP_ARROW)) speed += 0.1; // Risky boost
+    // Brake and boost (keyboard + touch)
+    if (keyIsDown(DOWN_ARROW) || touchControls.down) speed -= friction;
+    if (keyIsDown(UP_ARROW) || touchControls.up) speed += 0.1; // Risky boost
     
     // Check collisions
     checkCollisions(offset);
@@ -228,6 +236,9 @@ function draw() {
   fill(255, 200);
   textSize(12);
   text(`🚗 AI Mountain Racer - Built with p5.js`, 10, height - 10);
+  
+  // Mobile touch controls UI
+  drawTouchControls();
   
   // Handle different game states
   if (showingLeaderboard) {
@@ -771,5 +782,88 @@ async function submitToLeaderboard() {
     submissionError = '';
   } catch (error) {
     submissionError = error.message || 'Failed to submit score';
+  }
+}
+
+// Mobile touch controls
+function drawTouchControls() {
+  // Only show on mobile or when game is active
+  if (!gameOver && !showingEmailInput && !showingLeaderboard) {
+    let buttonSize = 60;
+    let margin = 20;
+    
+    // Left/Right steering buttons
+    drawTouchButton(margin, height - buttonSize - margin, buttonSize, "←", touchControls.left);
+    drawTouchButton(margin + buttonSize + 10, height - buttonSize - margin, buttonSize, "→", touchControls.right);
+    
+    // Up/Down buttons on right side
+    drawTouchButton(width - buttonSize - margin, height - buttonSize * 2 - margin - 10, buttonSize, "↑", touchControls.up);
+    drawTouchButton(width - buttonSize - margin, height - buttonSize - margin, buttonSize, "↓", touchControls.down);
+  }
+}
+
+function drawTouchButton(x, y, size, label, isPressed) {
+  // Button background
+  fill(isPressed ? 100 : 50, isPressed ? 150 : 100, isPressed ? 255 : 150, 150);
+  stroke(255, 100);
+  strokeWeight(2);
+  rect(x, y, size, size, 10);
+  
+  // Button label
+  fill(255);
+  textAlign(CENTER);
+  textSize(24);
+  text(label, x + size/2, y + size/2 + 8);
+  noStroke();
+}
+
+function touchStarted() {
+  handleTouch(true);
+  return false; // Prevent default
+}
+
+function touchEnded() {
+  handleTouch(false);
+  return false; // Prevent default
+}
+
+function handleTouch(isPressed) {
+  if (touches.length === 0 && !isPressed) {
+    // No touches, reset all
+    touchControls.left = false;
+    touchControls.right = false;
+    touchControls.up = false;
+    touchControls.down = false;
+    return;
+  }
+  
+  let buttonSize = 60;
+  let margin = 20;
+  
+  // Check each touch point
+  for (let touch of touches) {
+    let tx = touch.x;
+    let ty = touch.y;
+    
+    // Left button
+    if (tx > margin && tx < margin + buttonSize && 
+        ty > height - buttonSize - margin && ty < height - margin) {
+      touchControls.left = isPressed;
+    }
+    // Right button
+    else if (tx > margin + buttonSize + 10 && tx < margin + buttonSize * 2 + 10 && 
+             ty > height - buttonSize - margin && ty < height - margin) {
+      touchControls.right = isPressed;
+    }
+    // Up button
+    else if (tx > width - buttonSize - margin && tx < width - margin && 
+             ty > height - buttonSize * 2 - margin - 10 && ty < height - buttonSize - margin - 10) {
+      touchControls.up = isPressed;
+    }
+    // Down button
+    else if (tx > width - buttonSize - margin && tx < width - margin && 
+             ty > height - buttonSize - margin && ty < height - margin) {
+      touchControls.down = isPressed;
+    }
   }
 }
