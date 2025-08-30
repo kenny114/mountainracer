@@ -3,7 +3,6 @@
 **The viral game that starts so easy a toddler can play, then becomes IMPOSSIBLE after 20 seconds!**
 
 [![Play Now](https://img.shields.io/badge/🎮-PLAY%20NOW-brightgreen?style=for-the-badge)](https://kenny114.github.io/mountainracer)
-[![Leaderboard](https://img.shields.io/badge/🏆-LEADERBOARD-gold?style=for-the-badge)](#leaderboard)
 
 ## 🎯 The Challenge
 
@@ -14,11 +13,19 @@
 ## 🕹️ How to Play
 
 ### Controls
+
+**Desktop:**
 - **←→ Arrow Keys**: Steer your car
 - **↑ Arrow Key**: Risky boost (careful!)
 - **↓ Arrow Key**: Brake
 - **SPACE**: Restart game
 - **ENTER**: Save score to leaderboard
+
+**Mobile:**
+- **←→ Touch Buttons**: Steer (bottom left)
+- **↑ Touch Button**: Boost (bottom right)
+- **↓ Touch Button**: Brake (bottom right)
+- **Tap Screen**: Navigate menus
 
 ### Objective
 Survive as long as possible while avoiding:
@@ -127,3 +134,4 @@ Looking for more AI-built games? Check out:
 **🔗 Share with friends and challenge them to beat your score!**
 
 Made with ❤️ and 🤖 AI assistance
+
